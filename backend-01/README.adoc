@@ -1,0 +1,114 @@
+= Reto
+
+Desarrollar una API RESTful en NestJS (sobre NodeJS) que se conecte a una instancia de MySQL 8 y cumpla con la siguiente funcionalidad.
+
+== POST /students
+
+Crea un estudiante.
+
+=== Input
+
+[source,typescript]
+----
+type CreateStudentDto = {
+  firstName: string;
+  lastName: string;
+  birthdate: string; // Date in ISO 8601 format
+}
+----
+
+=== Output
+
+- Resource Created (201) - Incluye el id del nuevo estudiante.
+- Bad request (400)
+
+== POST /courses
+
+Crea una materia.
+
+=== Input
+
+[source,typescript]
+----
+type CreateCourseDto = {
+  name: string;
+  year: number;
+}
+----
+
+=== Output
+
+- Resource Created (201) - Incluye el id del nuevo curso.
+- Bad request (400)
+
+== POST /courses/:id/students
+
+Crea un estudiante para la materia de id `:id`.
+La columna `total` debe calcularse automáticamente en base a los valores de `attendance`, `work` y `exam`.
+
+=== Input
+
+[source,typescript]
+----
+type CreateEnrollmentDto = {
+  studentId: number;
+  attendance: number | null;
+  work: number | null;
+  exam: number | null;
+}
+----
+
+=== Output
+
+- Resource Created (201) - Debe incluir el id del enrollment.
+- Bad Request (400)
+- Not Found (404)
+
+== PATCH /enrollments/
+
+Actualiza las calificaciones de un estudiante
+
+=== Input
+
+[source,typescript]
+----
+type UpdateEnrollment = {
+  attendance?: number | null;
+  work?: number | null;
+  exam?: number | null;
+}
+----
+
+=== Output
+
+- OK (200)
+- Bad Request (400)
+- Not Found (404)
+
+== GET /courses/stats/best
+
+Devuelve la lista de los 3 mejores estudiantes de cada curso.
+
+=== Output
+
+[source,typescript]
+----
+type GetBestStatsOfCourses = Array<{
+  courseId: number;
+  courseName: string;
+  bestStudents: Array<{
+    studentId: number;
+    firstName: string;
+    lastName: string;
+    total: number;
+  }>;
+}>;
+----
+
+== Bonus
+
+- En `GET /courses/stats/best`, agregar un query parameter `courses` que reciba una lista separada de comas de ids de cursos para devolver las estadísticas de los cursos especificados.
+Por ejemplo, `GET /courses/stats/best?courses=1,2,3` sólo debería retornar las estadísticas de los cursos 1, 2 y 3.
+
+- Agregar las columnas `password` y `username` a la tabla `students`, además de las propiedades `password` y `username` para la creación de estudiantes.
+Luego, implementar un endpoint `/login` que realice la autenticación mediante tokens JWT.
