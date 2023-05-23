@@ -64,9 +64,10 @@ type CreateEnrollmentDto = {
 - Bad Request (400)
 - Not Found (404)
 
-== PATCH /enrollments/
+== PATCH /enrollments
 
-Actualiza las calificaciones de un estudiante
+Actualiza las calificaciones de un estudiante.
+La columna `total` debe calcularse automáticamente en base a los valores de `attendance`, `work` y `exam`.
 
 === Input
 
