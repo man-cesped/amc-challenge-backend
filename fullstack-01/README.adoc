@@ -1,0 +1,73 @@
+= Reto
+
+Desarrollar una interfaz gráfica que recupere las notas de un trimestre (CourseTerm/CourseTermEvaluation) y las muestre en una tabla.
+Además, para acceder a la información de la base de datos, crear una API RESTful en NestJS (sobre NodeJS) que se conecte a una instancia de MySQL 8 y cumpla con la siguiente funcionalidad.
+
+== GET /courses/:periodId-:courseCode/terms/:term
+
+Recupera la información de un trimestre de la materia delimitada por la gestión (periodId) y el código de la materia (courseCode).
+
+=== Output
+
+[source,typescript]
+----
+// Output principal
+type TermDetailsDto = {
+  periodId: number;
+  courseCode: string;
+  term: number;
+  attendanceTotal: number;
+  workTotal: number;
+  examTotal: number;
+  examSpec: ExamSpec;
+  grades: TermEvaluationDto[];
+};
+
+type ExamSpec = {
+  rubric: Array<{ item: string; total: number; }>; // Rúbrica del examen
+  juries: string[]; // Jurado
+};
+
+type TermEvaluationDto = {
+  memberCode: number; // Código del estudiante
+  attendance: number;
+  work: number;
+  exam: number;
+  total: number;
+  examDetails: ExamDetails;
+};
+
+type ExamDetails = {
+  [jury: string]: {
+    [rubricItem: string]: number;
+  }
+};
+----
+
+- OK (200)
+- Not Found (404)
+
+== Bonus
+
+- Agregar un endpoint `PATCH /courses/:periodId-:courseCode/terms/:term/students/:memberCode` que actualice la calificación del estudiante usando el siguiente input (se asume que la estructura de `ExamDetails` coincide con el `ExamSpec` del `CourseTerm` y que todos los números cuadran):
+
+[source,typescript]
+----
+type UpdateCourseTermEvaluation = Partial<{
+  attendance: number;
+  work: number;
+  exam: number;
+  examDetails: ExamDetails;
+  // total debe actualizarse en función a los demás parámetros
+}>
+
+type ExamDetails = {
+  [jury: string]: {
+    [rubricItem: string]: number;
+  }
+};
+----
+
+- En la actualización de la calificación de un estudiante, quitar del input el parámetro `exam` y calcularlo internamente en base a la especificación del examen (`ExamSpec`) presente en `CourseTerm`.
+
+- En la actualización de la calificación de un estudiante, validar que examDetails tenga la estructura esperada según la especificación del examen (`ExamSpec`) presente en `CourseTerm` y devolver un 'BadRequest (400)' si hubiera algún error.
